@@ -33,7 +33,7 @@ func TestReadFood(t *testing.T) {
 	if food.id != 3 {
 		t.Errorf("Food 3 ID is incorrect")
 	}
-	food = readFood(5)
+	food = readFood(-1)
 	if food != nil {
 		t.Errorf("Food 5 is not nil")
 	}
@@ -42,14 +42,28 @@ func TestReadFood(t *testing.T) {
 func TestInsertFood(t *testing.T) {
 	food := Food{4, "Spagetthi", 12000, "La Fonte"}
 	result := insertFood(food)
-	
-	if result == 0{
-		t.Errorf("Food id nil")
+
+	if result == 0 {
+		t.Errorf("Food is nil")
 	}
 
 	expectedFood := readFood(result)
 
-	if expectedFood == nil{
+	if expectedFood == nil {
 		t.Errorf("Food not inserted")
+	}
+}
+
+func TestDeleteFood(t *testing.T) {
+	foodInserted := Food{0, "Kopi Aku Kamu", 18000, "Aku Kamu"}
+	lastInsertId := insertFood(foodInserted)
+
+	if lastInsertId == 0 {
+		t.Errorf("Food should have been inserted")
+	}
+
+	affectedRows := deleteFood(lastInsertId)
+	if affectedRows != 1 {
+		t.Errorf("Food should have been only one")
 	}
 }

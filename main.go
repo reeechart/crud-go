@@ -50,9 +50,22 @@ func readFood(id int) *Food {
 
 func insertFood(food Food) int {
 	var lastInsertId int
-  err = db.QueryRow("INSERT INTO food(name,price,owner) VALUES($1,$2,$3) returning id;", food.name, food.price, food.owner).Scan(&lastInsertId)
+	err = db.QueryRow("INSERT INTO food(name,price,owner) VALUES($1,$2,$3) returning id;", food.name, food.price, food.owner).Scan(&lastInsertId)
 	checkError(err)
 	return lastInsertId
+}
+
+func deleteFood(foodId int) int64 {
+	stmt, err := db.Prepare("DELETE FROM food where id=$1")
+	checkError(err)
+
+	result, err := stmt.Exec(foodId)
+	checkError(err)
+
+	affectedRows, err := result.RowsAffected()
+	checkError(err)
+
+	return affectedRows
 }
 
 func checkError(err error) {
