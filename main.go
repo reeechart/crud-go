@@ -48,6 +48,13 @@ func readFood(id int) *Food {
 	}
 }
 
+func insertFood(food Food) int {
+	var lastInsertId int
+  err = db.QueryRow("INSERT INTO food(name,price,owner) VALUES($1,$2,$3) returning id;", food.name, food.price, food.owner).Scan(&lastInsertId)
+	checkError(err)
+	return lastInsertId
+}
+
 func checkError(err error) {
 	if err != nil {
 		panic(err)

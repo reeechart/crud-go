@@ -38,3 +38,18 @@ func TestReadFood(t *testing.T) {
 		t.Errorf("Food 5 is not nil")
 	}
 }
+
+func TestInsertFood(t *testing.T) {
+	food := Food{4, "Spagetthi", 12000, "La Fonte"}
+	result := insertFood(food)
+	
+	if result == 0{
+		t.Errorf("Food id nil")
+	}
+
+	expectedFood := readFood(result)
+
+	if expectedFood == nil{
+		t.Errorf("Food not inserted")
+	}
+}
