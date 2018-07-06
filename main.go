@@ -2,15 +2,20 @@ package main
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
+	"github.com/gorilla/mux"
 	_ "github.com/lib/pq"
+	"log"
+	"net/http"
+	"strconv"
 )
 
 type Food struct {
-	id    int
-	name  string
-	price int
-	owner string
+	Id    int    `json:"id,omitempty"`
+	Name  string `json:"name,omitempty"`
+	Price int    `json:"price,omitempty"`
+	Owner string `json:"owner,omitempty"`
 }
 
 const (
@@ -29,6 +34,15 @@ func main() {
 	db, err = sql.Open("postgres", dbinfo)
 	checkError(err)
 	defer db.Close()
+
+	router := CreateRouter()
+	log.Fatal(http.ListenAndServe(":8000", router))
+}
+
+func CreateRouter() *mux.Router {
+	router := mux.NewRouter()
+	router.HandleFunc("/food/{id}", GetFood).Methods("GET")
+	return router
 }
 
 func readFood(id int) *Food {
@@ -50,7 +64,7 @@ func readFood(id int) *Food {
 
 func insertFood(food Food) int {
 	var lastInsertId int
-	err = db.QueryRow("INSERT INTO food(name,price,owner) VALUES($1,$2,$3) returning id;", food.name, food.price, food.owner).Scan(&lastInsertId)
+	err = db.QueryRow("INSERT INTO food(name,price,owner) VALUES($1,$2,$3) returning id;", food.Name, food.Price, food.Owner).Scan(&lastInsertId)
 	checkError(err)
 	return lastInsertId
 }
@@ -72,13 +86,21 @@ func updateFoodPrice(id int, price int) int {
 	stmt, err := db.Prepare("UPDATE food set price=$1 where id=$2")
 	checkError(err)
 
-	res, err := stmt.Exec(price,id)
+	res, err := stmt.Exec(price, id)
 	checkError(err)
 
 	affectedRows, err := res.RowsAffected()
 	checkError(err)
 
 	return int(affectedRows)
+}
+
+func GetFood(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	foodId, err := strconv.Atoi(params["id"])
+	checkError(err)
+	food := readFood(foodId)
+	json.NewEncoder(w).Encode(food)
 }
 
 func checkError(err error) {
