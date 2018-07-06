@@ -8,6 +8,7 @@ import (
 	_ "github.com/lib/pq"
 	"log"
 	"net/http"
+	"net/url"
 	"strconv"
 )
 
@@ -43,6 +44,7 @@ func CreateRouter() *mux.Router {
 	router := mux.NewRouter()
 	router.HandleFunc("/food/{id}", GetFood).Methods("GET")
 	router.HandleFunc("/food", InsertNewFood).Methods("POST")
+	router.HandleFunc("/food/{id}", DeleteExistingFood).Methods("DELETE")
 	return router
 }
 
@@ -113,6 +115,24 @@ func InsertNewFood(w http.ResponseWriter, r *http.Request) {
 	insertedFoodId := insertFood(food)
 	insertedFood := readFood(insertedFoodId)
 	json.NewEncoder(w).Encode(insertedFood)
+}
+
+func DeleteExistingFood(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	foodId, err := strconv.Atoi(params["id"])
+	checkError(err)
+
+	deleteResponse := deleteFood(foodId)
+	successResponse := url.Values{}
+	successResponse.Add("status", "200")
+	failedResponse := url.Values{}
+	failedResponse.Add("status", "400")
+
+	if deleteResponse == 1 {
+		json.NewEncoder(w).Encode(successResponse)
+	} else {
+		json.NewEncoder(w).Encode(failedResponse)
+	}
 }
 
 func checkError(err error) {

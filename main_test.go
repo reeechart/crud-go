@@ -8,6 +8,7 @@ import (
 	"net/http/httptest"
 	"net/url"
 	"os"
+	"strconv"
 	"strings"
 	"testing"
 )
@@ -82,6 +83,21 @@ func TestInsertNewFood(t *testing.T) {
 	req, err := http.NewRequest("POST", "/food", strings.NewReader(foodData.Encode()))
 	checkError(err)
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+
+	rr := httptest.NewRecorder()
+	router := CreateRouter()
+
+	router.ServeHTTP(rr, req)
+	assert.Equal(t, http.StatusOK, rr.Code, "Response should be 200 OK")
+}
+
+func TestDeleteExistingFood(t *testing.T) {
+	food := Food{4, "Spagetthi", 12000, "La Fonte"}
+	lastInsertId := insertFood(food)
+	assert.NotEqual(t, 0, lastInsertId, "Food should have been inserted")
+
+	req, err := http.NewRequest("DELETE", "/food/"+strconv.Itoa(lastInsertId), nil)
+	checkError(err)
 
 	rr := httptest.NewRecorder()
 	router := CreateRouter()
