@@ -63,15 +63,20 @@ func TestUpdateFoodPrice(t *testing.T) {
 
 func TestGetFood(t *testing.T) {
 	req, err := http.NewRequest("GET", "/food/1", nil)
-	if err != nil {
-		t.Fatal(err)
-	}
+	checkError(err)
+
+	reqAllFood, err := http.NewRequest("GET", "/food", nil)
+	checkError(err)
 
 	rr := httptest.NewRecorder()
+	rrAllFood := httptest.NewRecorder()
 	router := CreateRouter()
 
 	router.ServeHTTP(rr, req)
-	assert.Equal(t, http.StatusOK, rr.Code, "Response should be 200 OK")
+	assert.Equal(t, http.StatusOK, rr.Code, "Response get food should be 200 OK")
+
+	router.ServeHTTP(rrAllFood, reqAllFood)
+	assert.Equal(t, http.StatusOK, rrAllFood.Code, "Response for get all food should be 200 OK")
 }
 
 func TestInsertNewFood(t *testing.T) {
@@ -106,7 +111,7 @@ func TestDeleteExistingFood(t *testing.T) {
 	assert.Equal(t, http.StatusOK, rr.Code, "Response should be 200 OK")
 }
 
-func TestUpdateExistingFoodPrice(t *testing.T){
+func TestUpdateExistingFoodPrice(t *testing.T) {
 	food := Food{4, "Spagetthi", 12000, "La Fonte"}
 	lastInsertId := insertFood(food)
 	assert.NotEqual(t, 0, lastInsertId, "Food should have been inserted")
@@ -117,6 +122,17 @@ func TestUpdateExistingFoodPrice(t *testing.T){
 	req, err := http.NewRequest("PUT", "/food/"+strconv.Itoa(lastInsertId), strings.NewReader(foodPrice.Encode()))
 	checkError(err)
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+
+	rr := httptest.NewRecorder()
+	router := CreateRouter()
+
+	router.ServeHTTP(rr, req)
+	assert.Equal(t, http.StatusOK, rr.Code, "Response should be 200 OK")
+}
+
+func TestGetAllFood(t *testing.T) {
+	req, err := http.NewRequest("GET", "/food", nil)
+	checkError(err)
 
 	rr := httptest.NewRecorder()
 	router := CreateRouter()

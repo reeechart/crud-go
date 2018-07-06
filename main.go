@@ -43,9 +43,10 @@ func main() {
 func CreateRouter() *mux.Router {
 	router := mux.NewRouter()
 	router.HandleFunc("/food/{id}", GetFood).Methods("GET")
+	router.HandleFunc("/food", GetAllFood).Methods("GET")
 	router.HandleFunc("/food", InsertNewFood).Methods("POST")
 	router.HandleFunc("/food/{id}", DeleteExistingFood).Methods("DELETE")
-	router.HandleFunc("/food/{id}",UpdateExistingFoodPrice).Methods("PUT")
+	router.HandleFunc("/food/{id}", UpdateExistingFoodPrice).Methods("PUT")
 	return router
 }
 
@@ -144,7 +145,7 @@ func UpdateExistingFoodPrice(w http.ResponseWriter, r *http.Request) {
 	foodPrice, err := strconv.Atoi(r.FormValue("price"))
 	checkError(err)
 
-	updatedResponse := updateFoodPrice(foodId,foodPrice)
+	updatedResponse := updateFoodPrice(foodId, foodPrice)
 	successResponse := url.Values{}
 	successResponse.Add("status", "200")
 	failedResponse := url.Values{}
@@ -155,6 +156,24 @@ func UpdateExistingFoodPrice(w http.ResponseWriter, r *http.Request) {
 	} else {
 		json.NewEncoder(w).Encode(failedResponse)
 	}
+}
+
+func GetAllFood(w http.ResponseWriter, r *http.Request) {
+	var foods []Food
+
+	rows, err := db.Query("SELECT * FROM food order by id")
+	checkError(err)
+	for rows.Next() {
+		var id int
+		var name string
+		var price int
+		var owner string
+		err = rows.Scan(&id, &name, &price, &owner)
+		checkError(err)
+
+		foods = append(foods, Food{id, name, price, owner})
+	}
+	json.NewEncoder(w).Encode(foods)
 }
 
 func checkError(err error) {
