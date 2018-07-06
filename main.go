@@ -55,7 +55,7 @@ func insertFood(food Food) int {
 	return lastInsertId
 }
 
-func deleteFood(foodId int) int64 {
+func deleteFood(foodId int) int {
 	stmt, err := db.Prepare("DELETE FROM food where id=$1")
 	checkError(err)
 
@@ -65,7 +65,20 @@ func deleteFood(foodId int) int64 {
 	affectedRows, err := result.RowsAffected()
 	checkError(err)
 
-	return affectedRows
+	return int(affectedRows)
+}
+
+func updateFoodPrice(id int, price int) int {
+	stmt, err := db.Prepare("UPDATE food set price=$1 where id=$2")
+	checkError(err)
+
+	res, err := stmt.Exec(price,id)
+	checkError(err)
+
+	affectedRows, err := res.RowsAffected()
+	checkError(err)
+
+	return int(affectedRows)
 }
 
 func checkError(err error) {

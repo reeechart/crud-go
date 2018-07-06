@@ -47,3 +47,11 @@ func TestDeleteFood(t *testing.T) {
 	affectedRows := deleteFood(lastInsertId)
 	assert.Equal(t, 1, int(affectedRows), "There should be only 1 food affected")
 }
+
+func TestUpdateFoodPrice(t *testing.T) {
+	affectedRows := updateFoodPrice(1, 28000)
+	assert.Equal(t, 1, affectedRows, "There should be only 1 food affected")
+	food := readFood(1)
+	assert.Equal(t, 1, food.id, "Effects of update should have applied only to food ID 1")
+	assert.Equal(t, 28000, food.price, "Food price should have been updated")
+}
