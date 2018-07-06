@@ -45,7 +45,7 @@ func TestDeleteFood(t *testing.T) {
 	assert.NotEqual(t, 0, lastInsertId, "Food should have been inserted")
 
 	affectedRows := deleteFood(lastInsertId)
-	assert.Equal(t, 1, int(affectedRows), "There should be only 1 food affected")
+	assert.Equal(t, 1, affectedRows, "There should be only 1 food affected")
 }
 
 func TestUpdateFoodPrice(t *testing.T) {
