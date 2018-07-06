@@ -45,6 +45,7 @@ func CreateRouter() *mux.Router {
 	router.HandleFunc("/food/{id}", GetFood).Methods("GET")
 	router.HandleFunc("/food", InsertNewFood).Methods("POST")
 	router.HandleFunc("/food/{id}", DeleteExistingFood).Methods("DELETE")
+	router.HandleFunc("/food/{id}",UpdateExistingFoodPrice).Methods("PUT")
 	return router
 }
 
@@ -129,6 +130,27 @@ func DeleteExistingFood(w http.ResponseWriter, r *http.Request) {
 	failedResponse.Add("status", "400")
 
 	if deleteResponse == 1 {
+		json.NewEncoder(w).Encode(successResponse)
+	} else {
+		json.NewEncoder(w).Encode(failedResponse)
+	}
+}
+
+func UpdateExistingFoodPrice(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	foodId, err := strconv.Atoi(params["id"])
+	checkError(err)
+
+	foodPrice, err := strconv.Atoi(r.FormValue("price"))
+	checkError(err)
+
+	updatedResponse := updateFoodPrice(foodId,foodPrice)
+	successResponse := url.Values{}
+	successResponse.Add("status", "200")
+	failedResponse := url.Values{}
+	failedResponse.Add("status", "400")
+
+	if updatedResponse == 1 {
 		json.NewEncoder(w).Encode(successResponse)
 	} else {
 		json.NewEncoder(w).Encode(failedResponse)

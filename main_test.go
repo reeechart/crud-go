@@ -105,3 +105,22 @@ func TestDeleteExistingFood(t *testing.T) {
 	router.ServeHTTP(rr, req)
 	assert.Equal(t, http.StatusOK, rr.Code, "Response should be 200 OK")
 }
+
+func TestUpdateExistingFoodPrice(t *testing.T){
+	food := Food{4, "Spagetthi", 12000, "La Fonte"}
+	lastInsertId := insertFood(food)
+	assert.NotEqual(t, 0, lastInsertId, "Food should have been inserted")
+
+	foodPrice := url.Values{}
+	foodPrice.Set("price", "30000")
+
+	req, err := http.NewRequest("PUT", "/food/"+strconv.Itoa(lastInsertId), strings.NewReader(foodPrice.Encode()))
+	checkError(err)
+	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+
+	rr := httptest.NewRecorder()
+	router := CreateRouter()
+
+	router.ServeHTTP(rr, req)
+	assert.Equal(t, http.StatusOK, rr.Code, "Response should be 200 OK")
+}
