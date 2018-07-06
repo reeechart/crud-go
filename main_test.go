@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"testing"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestMain(m *testing.M) {
@@ -20,50 +21,29 @@ func TestMain(m *testing.M) {
 
 func TestReadFood(t *testing.T) {
 	food := readFood(1)
-	if food == nil {
-		t.Errorf("Food 1 is nil")
-	}
-	if food.id != 1 {
-		t.Errorf("Food ID is incorrect")
-	}
+	assert.NotNil(t, food)
+	assert.Equal(t, 1, food.id, "Food ID 1 should be equal")
 	food = readFood(3)
-	if food == nil {
-		t.Errorf("Food 3 is nil")
-	}
-	if food.id != 3 {
-		t.Errorf("Food 3 ID is incorrect")
-	}
+	assert.NotNil(t, food)
+	assert.Equal(t, 3, food.id, "Food ID 3 should be equal")
 	food = readFood(-1)
-	if food != nil {
-		t.Errorf("Food 5 is not nil")
-	}
+	assert.Nil(t, food)
 }
 
 func TestInsertFood(t *testing.T) {
 	food := Food{4, "Spagetthi", 12000, "La Fonte"}
-	result := insertFood(food)
+	lastInsertId := insertFood(food)
+	assert.NotEqual(t, 0, lastInsertId, "Food should have been inserted")
 
-	if result == 0 {
-		t.Errorf("Food is nil")
-	}
-
-	expectedFood := readFood(result)
-
-	if expectedFood == nil {
-		t.Errorf("Food not inserted")
-	}
+	insertedFood := readFood(lastInsertId)
+	assert.NotNil(t, insertedFood)
 }
 
 func TestDeleteFood(t *testing.T) {
 	foodInserted := Food{0, "Kopi Aku Kamu", 18000, "Aku Kamu"}
 	lastInsertId := insertFood(foodInserted)
-
-	if lastInsertId == 0 {
-		t.Errorf("Food should have been inserted")
-	}
+	assert.NotEqual(t, 0, lastInsertId, "Food should have been inserted")
 
 	affectedRows := deleteFood(lastInsertId)
-	if affectedRows != 1 {
-		t.Errorf("Food should have been only one")
-	}
+	assert.Equal(t, 1, int(affectedRows), "There should be only 1 food affected")
 }
