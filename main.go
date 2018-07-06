@@ -42,6 +42,7 @@ func main() {
 func CreateRouter() *mux.Router {
 	router := mux.NewRouter()
 	router.HandleFunc("/food/{id}", GetFood).Methods("GET")
+	router.HandleFunc("/food", InsertNewFood).Methods("POST")
 	return router
 }
 
@@ -101,6 +102,17 @@ func GetFood(w http.ResponseWriter, r *http.Request) {
 	checkError(err)
 	food := readFood(foodId)
 	json.NewEncoder(w).Encode(food)
+}
+
+func InsertNewFood(w http.ResponseWriter, r *http.Request) {
+	foodName := r.FormValue("name")
+	foodPrice, err := strconv.Atoi(r.FormValue("price"))
+	checkError(err)
+	foodOwner := r.FormValue("owner")
+	food := Food{0, foodName, foodPrice, foodOwner}
+	insertedFoodId := insertFood(food)
+	insertedFood := readFood(insertedFoodId)
+	json.NewEncoder(w).Encode(insertedFood)
 }
 
 func checkError(err error) {

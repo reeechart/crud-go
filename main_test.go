@@ -3,11 +3,12 @@ package main
 import (
 	"database/sql"
 	"fmt"
-	"github.com/gorilla/mux"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"os"
+	"strings"
 	"testing"
 )
 
@@ -72,8 +73,19 @@ func TestGetFood(t *testing.T) {
 	assert.Equal(t, http.StatusOK, rr.Code, "Response should be 200 OK")
 }
 
-func Router() *mux.Router {
-	r := mux.NewRouter()
-	r.HandleFunc("/food/{id}", GetFood).Methods("GET")
-	return r
+func TestInsertNewFood(t *testing.T) {
+	foodData := url.Values{}
+	foodData.Set("name", "Latte")
+	foodData.Set("price", "10000")
+	foodData.Set("owner", "Jumpstart")
+
+	req, err := http.NewRequest("POST", "/food", strings.NewReader(foodData.Encode()))
+	checkError(err)
+	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+
+	rr := httptest.NewRecorder()
+	router := CreateRouter()
+
+	router.ServeHTTP(rr, req)
+	assert.Equal(t, http.StatusOK, rr.Code, "Response should be 200 OK")
 }
