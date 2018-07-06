@@ -13,6 +13,11 @@ go build
 go test
 ```
 
+## Automated Testing, Build, and Run nstructions
+```
+./run-api.sh
+```
+
 ## Authors
-Andri Suranta Ginting
-Ferdinandus Richard
+- Andri Suranta Ginting
+- Ferdinandus Richard
