@@ -1,0 +1,8 @@
+language: go
+go:
+  - master
+services:
+  - postgresql
+before_script:
+  - psql -c 'CREATE DATABASE food_test;' -U postgres
+  - psql food_test < food.sql
