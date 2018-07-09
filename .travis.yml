@@ -3,8 +3,8 @@ go:
   - master
 services:
   - postgresql
+addons:
+  postgresql: "10"
 before_script:
   - psql -c 'CREATE DATABASE food_test;' -U postgres
   - psql food_test < food.sql
-addons:
-  postgresql: "10"
