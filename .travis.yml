@@ -5,6 +5,11 @@ services:
   - postgresql
 addons:
   postgresql: "10"
+  apt:
+    packages:
+      - postgresql-10
+      - postgresql-client-10
+dist: trusty
 before_script:
   - psql -c 'CREATE DATABASE food_test;' -U postgres
   - psql food_test < food.sql
