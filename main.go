@@ -7,8 +7,9 @@ import (
 	"log"
 	"net/http"
 	"github.com/gorilla/mux"
-	"github.com/lib/pq"
+	_ "github.com/lib/pq"
 	"net/url"
+	"os"
 	"strconv"
 )
 
