@@ -4,10 +4,10 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"github.com/gorilla/mux"
-	"github.com/lib/pq"
 	"log"
 	"net/http"
+	"github.com/gorilla/mux"
+	"github.com/lib/pq"
 	"net/url"
 	"strconv"
 )
