@@ -1,7 +1,6 @@
 language: go
 go:
   - master 
-script: ./run-api.sh
 services:
   - postgresql
 before_script:
