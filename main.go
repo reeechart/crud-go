@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"github.com/gorilla/mux"
 	_ "github.com/lib/pq"
+	"github.com/spf13/viper"
 	"net/url"
 	"os"
 	"strconv"
@@ -21,9 +22,10 @@ type Food struct {
 }
 
 const (
-	DB_USERNAME = "postgres"
-	DB_PASSWORD = "postgres"
-	DB_NAME     = "food_test"
+	POSTGRE_USERNAME_KEY = "PGUSERNAME"
+	POSTGRE_PORT_KEY = "PGPORT"
+	POSTGRE_PASSWORD_KEY = "PGPASSWORD"
+	POSTGRE_DB_NAME_KEY = "DBNAME"
 )
 
 var (
@@ -32,13 +34,28 @@ var (
 )
 
 func main() {
-	dbinfo := fmt.Sprintf("user=%s port=%s password=%s dbname=%s sslmode=disable", DB_USERNAME, os.Getenv("PGPORT"), os.Getenv("PGPASSWORD"), DB_NAME)
+	viperConfig := GetConfig()
+	username, port, password, dbname := GetParsedConfig(viperConfig)
+	dbinfo := fmt.Sprintf("user=%s port=%d password=%s dbname=%s sslmode=disable", username, port, password, dbname)
 	db, err = sql.Open("postgres", dbinfo)
 	checkError(err)
 	defer db.Close()
 
 	router := CreateRouter()
 	log.Fatal(http.ListenAndServe(":8000", router))
+}
+
+func GetConfig() *viper.Viper {
+	config := viper.New()
+	config.SetConfigFile("app.yml")
+	err := config.ReadInConfig()
+	checkError(err)
+	return config
+}
+
+func GetParsedConfig(viper *viper.Viper) (string, int, string, string) {
+	deployEnv := os.Getenv("DEPLOYENV")
+	return viper.GetString(deployEnv+"."+POSTGRE_USERNAME_KEY), viper.GetInt(deployEnv+"."+POSTGRE_PORT_KEY), viper.GetString(deployEnv+"."+POSTGRE_PASSWORD_KEY), viper.GetString(deployEnv+"."+POSTGRE_DB_NAME_KEY)
 }
 
 func CreateRouter() *mux.Router {
