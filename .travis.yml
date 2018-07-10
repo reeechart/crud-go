@@ -15,7 +15,8 @@ before_script:
   - psql food_test < food.sql
 env:
   global:
-  - DEPLOYENV=ci
+  - DEPLOYENV="ci"
+  - PGPORT=5433
 before_install:
   - sudo sed -i -e '/local.*peer/s/postgres/all/' -e 's/peer\|md5/trust/g' /etc/postgresql/*/main/pg_hba.conf
   - sudo service postgresql restart
