@@ -55,7 +55,6 @@ func GetConfig() *viper.Viper {
 
 func GetParsedConfig(viper *viper.Viper) (string, int, string, string) {
 	deployEnv := os.Getenv("DEPLOYENV")
-	fmt.Println(viper.GetString(deployEnv+"."+POSTGRE_USERNAME_KEY) + " " + strconv.Itoa(viper.GetInt(deployEnv+"."+POSTGRE_PORT_KEY)) + " " + viper.GetString(deployEnv+"."+POSTGRE_PASSWORD_KEY) + " " + viper.GetString(deployEnv+"."+POSTGRE_DB_NAME_KEY))
 	return viper.GetString(deployEnv+"."+POSTGRE_USERNAME_KEY), viper.GetInt(deployEnv+"."+POSTGRE_PORT_KEY), viper.GetString(deployEnv+"."+POSTGRE_PASSWORD_KEY), viper.GetString(deployEnv+"."+POSTGRE_DB_NAME_KEY)
 }
 
