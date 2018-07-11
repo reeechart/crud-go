@@ -35,8 +35,8 @@ var (
 
 func main() {
 	viperConfig := GetConfig()
-	username, port, password, dbname := GetParsedConfig(viperConfig)
-	dbinfo := fmt.Sprintf("user=%s port=%d password=%s dbname=%s sslmode=disable", username, port, password, dbname)
+	username, port, _, dbname := GetParsedConfig(viperConfig)
+	dbinfo := fmt.Sprintf("user=%s port=%d dbname=%s sslmode=disable", username, port, dbname)
 	db, err = sql.Open("postgres", dbinfo)
 	checkError(err)
 	defer db.Close()
@@ -55,6 +55,7 @@ func GetConfig() *viper.Viper {
 
 func GetParsedConfig(viper *viper.Viper) (string, int, string, string) {
 	deployEnv := os.Getenv("DEPLOYENV")
+	fmt.Println(viper.GetString(deployEnv+"."+POSTGRE_USERNAME_KEY) + " " + strconv.Itoa(viper.GetInt(deployEnv+"."+POSTGRE_PORT_KEY)) + " " + viper.GetString(deployEnv+"."+POSTGRE_PASSWORD_KEY) + " " + viper.GetString(deployEnv+"."+POSTGRE_DB_NAME_KEY))
 	return viper.GetString(deployEnv+"."+POSTGRE_USERNAME_KEY), viper.GetInt(deployEnv+"."+POSTGRE_PORT_KEY), viper.GetString(deployEnv+"."+POSTGRE_PASSWORD_KEY), viper.GetString(deployEnv+"."+POSTGRE_DB_NAME_KEY)
 }
 
